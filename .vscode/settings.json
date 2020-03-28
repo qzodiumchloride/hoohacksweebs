@@ -1,3 +1,4 @@
 {
-    "python.pythonPath": "C:\\Users\\wenzh\\anaconda3\\envs\\neural-network-projects-python\\python.exe"
+    "python.pythonPath": "C:\\Users\\wenzh\\anaconda3\\envs\\neural-network-projects-python\\python.exe",
+    "git.ignoreLimitWarning": true
 }
