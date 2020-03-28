@@ -1,3 +1,6 @@
+# code borrowed from the book Neural Network Projects with Python by James Loy
+
+
 '''
 Main code for training a Siamese neural network for face recognition
 '''
@@ -16,7 +19,7 @@ weeb_dir = 'prediction model/moeimouto-faces'
 num_classes = len(np.unique(Y_train))
 
 # Create Siamese Neural Network
-input_shape = X_train.shape[1:]
+input_shape = 32
 shared_network = helpful_functions.create_shared_network(input_shape)
 input_top = Input(shape=input_shape)
 input_bottom = Input(shape=input_shape)
