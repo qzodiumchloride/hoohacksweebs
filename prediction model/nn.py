@@ -7,7 +7,6 @@ from keras.utils import to_categorical
 import numpy as np
 import os
 import cv2
-import glob
 import random
 import warnings
 warnings.filterwarnings("ignore")
@@ -21,13 +20,13 @@ weeb_dir = 'prediction model/moeimouto-faces/'
 Y_train_one_hot = to_categorical(Y_train)
 Y_test_one_hot = to_categorical(Y_test)
 
-# X_train = X_train / 255
-# X_test = X_test / 255
+X_train = X_train[0] / 255
+X_test = X_test[0] / 255
 
 # Define hyperparameters
 FILTER_SIZE = 3
 NUM_FILTERS = 32
-INPUT_SIZE = 32
+INPUT_SIZE = 160
 MAXPOOL_SIZE = 2
 BATCH_SIZE = 16
 STEPS_PER_EPOCH = 20000//BATCH_SIZE
@@ -41,10 +40,11 @@ model.add(Conv2D(NUM_FILTERS, (FILTER_SIZE, FILTER_SIZE), activation='relu'))
 model.add(MaxPooling2D(pool_size=(MAXPOOL_SIZE, MAXPOOL_SIZE)))
 model.add(Flatten())
 model.add(Dense(units=2000, activation='relu'))
-model.add(Dropout(0.5))
-model.add(Dense(units=202, activation='softmax'))
+model.add(Dense(units=174, activation='softmax'))
 model.compile(optimizer='adam', loss='categorical_crossentropy',
               metrics=['accuracy'])
 
-# hist = model.fit(X_train, Y_train_one_hot,
-#                  BATCH_SIZE, EPOCHS, validation_split=0.3)
+X_train = X_train.reshape([-1, 160, 160, 3])
+
+hist = model.fit(X_train, Y_train_one_hot,
+                 BATCH_SIZE, EPOCHS, validation_split=0.2)
