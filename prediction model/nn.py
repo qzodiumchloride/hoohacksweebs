@@ -3,7 +3,6 @@ from keras.preprocessing.image import ImageDataGenerator
 from keras.layers import Dropout, Flatten, Dense
 from keras.layers import Conv2D, MaxPooling2D
 from keras.models import Sequential
-from keras.utils import to_categorical
 import numpy as np
 import os
 import cv2
@@ -17,34 +16,18 @@ weeb_dir = 'prediction model/moeimouto-faces/'
 (X_train, Y_train, label_train), (X_test,
                                   Y_test, label_test) = hf.test_train_split()
 
-Y_train_one_hot = to_categorical(Y_train)
-Y_test_one_hot = to_categorical(Y_test)
-
-X_train = X_train[0] / 255
-X_test = X_test[0] / 255
-
-# Define hyperparameters
-FILTER_SIZE = 3
-NUM_FILTERS = 32
-INPUT_SIZE = 160
-MAXPOOL_SIZE = 2
-BATCH_SIZE = 16
-STEPS_PER_EPOCH = 20000//BATCH_SIZE
-EPOCHS = 10
 
 model = Sequential()
-model.add(Conv2D(NUM_FILTERS, (FILTER_SIZE, FILTER_SIZE),
-                 input_shape=(INPUT_SIZE, INPUT_SIZE, 3), activation='relu'))
-model.add(MaxPooling2D(pool_size=(MAXPOOL_SIZE, MAXPOOL_SIZE)))
-model.add(Conv2D(NUM_FILTERS, (FILTER_SIZE, FILTER_SIZE), activation='relu'))
-model.add(MaxPooling2D(pool_size=(MAXPOOL_SIZE, MAXPOOL_SIZE)))
+model.add(Conv2D(32, (3, 3),
+                 input_shape=(160, 160, 3), activation='relu'))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(Conv2D(64, (3, 3), activation='relu'))
+model.add(MaxPooling2D(pool_size=(2, 2)))
 model.add(Flatten())
-model.add(Dense(units=2000, activation='relu'))
-model.add(Dense(units=174, activation='softmax'))
+model.add(Dense(units=1000, activation='relu'))
+model.add(Dense(units=173, activation='softmax'))
 model.compile(optimizer='adam', loss='categorical_crossentropy',
               metrics=['accuracy'])
 
-X_train = X_train.reshape([-1, 160, 160, 3])
-
-hist = model.fit(X_train, Y_train_one_hot,
-                 BATCH_SIZE, EPOCHS, validation_split=0.2)
+hist = model.fit(X_train, Y_train,
+                 156, 10, validation_split=0.3)
