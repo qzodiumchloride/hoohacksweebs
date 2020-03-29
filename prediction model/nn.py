@@ -21,11 +21,8 @@ weeb_dir = 'prediction model/moeimouto-faces/'
 Y_train_one_hot = to_categorical(Y_train)
 Y_test_one_hot = to_categorical(Y_test)
 
-X_train = np.array(X_train)
-X_test = np.array(X_test)
-
-X_train = X_train / 255
-X_test = X_test / 255
+# X_train = X_train / 255
+# X_test = X_test / 255
 
 # Define hyperparameters
 FILTER_SIZE = 3
@@ -49,5 +46,5 @@ model.add(Dense(units=202, activation='softmax'))
 model.compile(optimizer='adam', loss='categorical_crossentropy',
               metrics=['accuracy'])
 
-hist = model.fit(X_train, Y_train_one_hot,
-                 BATCH_SIZE, EPOCHS, validation_split=0.3)
+# hist = model.fit(X_train, Y_train_one_hot,
+#                  BATCH_SIZE, EPOCHS, validation_split=0.3)
