@@ -4,6 +4,7 @@ from keras.layers import Dropout, Flatten, Dense
 from keras.layers import Conv2D, MaxPooling2D
 from keras.models import Sequential
 from keras.utils import to_categorical
+import numpy as np
 import os
 import cv2
 import glob
@@ -14,7 +15,17 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 weeb_dir = 'prediction model/moeimouto-faces/'
 
-(X_train, Y_train), (X_test, Y_test), (Z, Z2) = hf.test_train_split()
+(X_train, Y_train, label_train), (X_test,
+                                  Y_test, label_test) = hf.test_train_split()
+
+Y_train_one_hot = to_categorical(Y_train)
+Y_test_one_hot = to_categorical(Y_test)
+
+X_train = np.array(X_train)
+X_test = np.array(X_test)
+
+X_train = X_train / 255
+X_test = X_test / 255
 
 # Define hyperparameters
 FILTER_SIZE = 3
@@ -32,11 +43,11 @@ model.add(MaxPooling2D(pool_size=(MAXPOOL_SIZE, MAXPOOL_SIZE)))
 model.add(Conv2D(NUM_FILTERS, (FILTER_SIZE, FILTER_SIZE), activation='relu'))
 model.add(MaxPooling2D(pool_size=(MAXPOOL_SIZE, MAXPOOL_SIZE)))
 model.add(Flatten())
-model.add(Dense(units=128, activation='relu'))
+model.add(Dense(units=2000, activation='relu'))
 model.add(Dropout(0.5))
 model.add(Dense(units=202, activation='softmax'))
 model.compile(optimizer='adam', loss='categorical_crossentropy',
               metrics=['accuracy'])
 
-hist = model.fit(X_train, Y_train,
+hist = model.fit(X_train, Y_train_one_hot,
                  BATCH_SIZE, EPOCHS, validation_split=0.3)
