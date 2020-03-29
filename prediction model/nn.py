@@ -3,7 +3,10 @@ from keras.preprocessing.image import ImageDataGenerator
 from keras.layers import Dropout, Flatten, Dense
 from keras.layers import Conv2D, MaxPooling2D
 from keras.models import Sequential
+from keras.utils import to_categorical
 import os
+import cv2
+import glob
 import random
 import warnings
 warnings.filterwarnings("ignore")
@@ -11,7 +14,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 weeb_dir = 'prediction model/moeimouto-faces/'
 
-(X_train, Y_train), (X_test, Y_test) = hf.test_train_split()
+(X_train, Y_train), (X_test, Y_test), (Z, Z2) = hf.test_train_split()
 
 # Define hyperparameters
 FILTER_SIZE = 3
@@ -31,15 +34,9 @@ model.add(MaxPooling2D(pool_size=(MAXPOOL_SIZE, MAXPOOL_SIZE)))
 model.add(Flatten())
 model.add(Dense(units=128, activation='relu'))
 model.add(Dropout(0.5))
-model.add(Dense(units=1, activation='softmax'))
+model.add(Dense(units=202, activation='softmax'))
 model.compile(optimizer='adam', loss='categorical_crossentropy',
               metrics=['accuracy'])
 
-
-model.fit_generator(
-    training_set, steps_per_epoch=STEPS_PER_EPOCH, epochs=EPOCHS, verbose=1)
-
-score = model.evaluate_generator(test_set, steps=100)
-
-for idx, metric in enumerate(model.metrics_names):
-    print("{}: {}".format(metric, score[idx]))
+hist = model.fit(X_train, Y_train,
+                 BATCH_SIZE, EPOCHS, validation_split=0.3)
