@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import os
 from keras.utils import to_categorical
+from skimage.transform import resize
 
 weeb_dir = 'prediction model/moeimouto-faces/'
 
@@ -21,8 +22,8 @@ def test_train_split():
     X_train, Y_train, label_train = [], [], []
     X_test, Y_test, label_test = [], [], []
 
-    X_train = np.zeros(shape=(1, 160, 160, 3))
-    X_test = np.zeros(shape=(1, 160, 160, 3))
+    X_train = np.zeros(shape=(1, 32, 32, 3))
+    X_test = np.zeros(shape=(1, 32, 32, 3))
 
     idx = -1
     _, files, _ = next(os.walk(weeb_dir))
@@ -36,51 +37,63 @@ def test_train_split():
                 pass
             else:
                 if idy < num_train_test(weeb_dir, img_file):
-                    image = cv2.imread(os.path.join(weeb_dir+img_file, img))
                     try:
-                        if(image.shape == (160, 160, 3)):
-                            image = image / 255
-                            image = image.reshape(1, 160, 160, 3)
-                        else:
-                            x = 160
-                            y = 160
-                            if(image.shape[0] != 160):
-                                x = 160 - image.shape[0]
-                            if(image.shape[1] != 160):
-                                y = 160 - image.shape[1]
-                            temp = np.zeros(shape=(x, y, 3))
-                            image = np.append(image, temp, axis=0)
-                            image = image / 255
-                            image = image.reshape(1, 160, 160, 3)
+                        image = cv2.imread(
+                            os.path.join(weeb_dir+img_file, img))
+                        image_resized = resize(image, (32, 32, 3))
+                        image_resized = image_resized.reshape(1, 32, 32, 3)
+                        # try:
+                        #     if(image.shape == (160, 160, 3)):
+                        #         image = image / 255
+                        #         image = image.reshape(1, 160, 160, 3)
+                        #     else:
+                        #         x = 160
+                        #         y = 160
+                        #         if(image.shape[0] != 160):
+                        #             x = 160 - image.shape[0]
+                        #         if(image.shape[1] != 160):
+                        #             y = 160 - image.shape[1]
+                        #         temp = np.zeros(shape=(x, y, 3))
+                        #         image = np.append(image, temp, axis=0)
+                        #         image = image / 255
+                        #         image = image.reshape(1, 160, 160, 3)
 
-                        X_train = np.append(X_train, image, axis=0)
+                        X_train = np.append(X_train, image_resized, axis=0)
                         Y_train.append(idx)
                         label_train.append(img_file)
+                        # except:
+                        #     pass
                     except:
                         pass
                 else:
-                    image = cv2.imread(os.path.join(weeb_dir+img_file, img))
                     try:
-                        if(image.shape == (160, 160, 3)):
-                            image = image / 255
-                            image = image.reshape(1, 160, 160, 3)
-                        else:
-                            x = 160
-                            y = 160
-                            if(image.shape[0] != 160):
-                                x = 160 - image.shape[0]
-                            if(image.shape[1] != 160):
-                                y = 160 - image.shape[1]
-                            temp = np.zeros(shape=(x, y, 3))
-                            image = np.append(image, temp, axis=0)
-                            image = image / 255
-                            image = image.reshape(1, 160, 160, 3)
+                        image = cv2.imread(
+                            os.path.join(weeb_dir+img_file, img))
+                        image_resized = resize(image, (32, 32, 3))
+                        image_resized = image_resized.reshape(1, 32, 32, 3)
+                        # try:
+                        #     if(image.shape == (160, 160, 3)):
+                        #         image = image / 255
+                        #         image = image.reshape(1, 160, 160, 3)
+                        #     else:
+                        #         x = 160
+                        #         y = 160
+                        #         if(image.shape[0] != 160):
+                        #             x = 160 - image.shape[0]
+                        #         if(image.shape[1] != 160):
+                        #             y = 160 - image.shape[1]
+                        #         temp = np.zeros(shape=(x, y, 3))
+                        #         image = np.append(image, temp, axis=0)
+                        #         image = image / 255
+                        #         image = image.reshape(1, 160, 160, 3)
 
-                        X_test = np.append(X_train, image, axis=0)
+                        X_test = np.append(X_test, image_resized, axis=0)
                         Y_test.append(idx)
                         label_test.append(img_file)
                     except:
                         pass
+                    # except:
+                    #     pass
 
     # X_train = np.array(X_train)
     # X_test = np.array(X_test)
@@ -108,6 +121,9 @@ def test_train_split():
 
     Y_train_one_hot = to_categorical(Y_train)
     Y_test_one_hot = to_categorical(Y_test)
+
+    X_train = X_train[1:]/255
+    X_test = X_test[1:]/255
 
     print(X_train.shape)
     print(Y_train_one_hot.shape)

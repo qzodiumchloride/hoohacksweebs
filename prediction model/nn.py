@@ -19,7 +19,7 @@ weeb_dir = 'prediction model/moeimouto-faces/'
 
 model = Sequential()
 model.add(Conv2D(32, (3, 3),
-                 input_shape=(160, 160, 3), activation='relu'))
+                 input_shape=(32, 32, 3), activation='relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 model.add(Conv2D(64, (3, 3), activation='relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
@@ -31,3 +31,7 @@ model.compile(optimizer='adam', loss='categorical_crossentropy',
 
 hist = model.fit(X_train, Y_train,
                  156, 10, validation_split=0.3)
+
+model.evaluate(X_test, Y_test)
+
+model.predict(X_test[0][0])
