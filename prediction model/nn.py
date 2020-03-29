@@ -1,42 +1,45 @@
-# code borrowed from the book Neural Network Projects with Python by James Loy
-
-
-'''
-Main code for training a Siamese neural network for face recognition
-'''
-import helpful_functions
-import numpy as np
-from keras.layers import Input, Lambda
-from keras.models import Model
+import helpful_functions as hf
+from keras.preprocessing.image import ImageDataGenerator
+from keras.layers import Dropout, Flatten, Dense
+from keras.layers import Conv2D, MaxPooling2D
+from keras.models import Sequential
 import os
-
+import random
+import warnings
+warnings.filterwarnings("ignore")
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
-weeb_dir = 'prediction model/moeimouto-faces'
+weeb_dir = 'prediction model/moeimouto-faces/'
 
-# Import Training and Testing Data
-(X_train, Y_train), (X_test, Y_test) = helpful_functions.get_data(weeb_dir)
-num_classes = len(np.unique(Y_train))
+(X_train, Y_train), (X_test, Y_test) = hf.test_train_split()
 
-# Create Siamese Neural Network
-input_shape = 32
-shared_network = helpful_functions.create_shared_network(input_shape)
-input_top = Input(shape=input_shape)
-input_bottom = Input(shape=input_shape)
-output_top = shared_network(input_top)
-output_bottom = shared_network(input_bottom)
-distance = Lambda(helpful_functions.euclidean_distance, output_shape=(1,))(
-    [output_top, output_bottom])
-model = Model(inputs=[input_top, input_bottom], outputs=distance)
+# Define hyperparameters
+FILTER_SIZE = 3
+NUM_FILTERS = 32
+INPUT_SIZE = 32
+MAXPOOL_SIZE = 2
+BATCH_SIZE = 16
+STEPS_PER_EPOCH = 20000//BATCH_SIZE
+EPOCHS = 10
 
-# Train the model
-training_pairs, training_labels = helpful_functions.create_pairs(
-    X_train, Y_train, num_classes=num_classes)
-model.compile(loss=helpful_functions.contrastive_loss,
-              optimizer='adam', metrics=[helpful_functions.accuracy])
-model.fit([training_pairs[:, 0], training_pairs[:, 1]], training_labels,
-          batch_size=128,
-          epochs=10)
+model = Sequential()
+model.add(Conv2D(NUM_FILTERS, (FILTER_SIZE, FILTER_SIZE),
+                 input_shape=(INPUT_SIZE, INPUT_SIZE, 3), activation='relu'))
+model.add(MaxPooling2D(pool_size=(MAXPOOL_SIZE, MAXPOOL_SIZE)))
+model.add(Conv2D(NUM_FILTERS, (FILTER_SIZE, FILTER_SIZE), activation='relu'))
+model.add(MaxPooling2D(pool_size=(MAXPOOL_SIZE, MAXPOOL_SIZE)))
+model.add(Flatten())
+model.add(Dense(units=128, activation='relu'))
+model.add(Dropout(0.5))
+model.add(Dense(units=1, activation='softmax'))
+model.compile(optimizer='adam', loss='categorical_crossentropy',
+              metrics=['accuracy'])
 
-# Save the model
-model.save('siamese_nn.h5')
+
+model.fit_generator(
+    training_set, steps_per_epoch=STEPS_PER_EPOCH, epochs=EPOCHS, verbose=1)
+
+score = model.evaluate_generator(test_set, steps=100)
+
+for idx, metric in enumerate(model.metrics_names):
+    print("{}: {}".format(metric, score[idx]))
