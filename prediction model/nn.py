@@ -1,3 +1,5 @@
+# got some help from https://medium.com/@randerson112358/classify-images-using-convolutional-neural-networks-python-a89cecc8c679
+
 import helpful_functions as hf
 from keras.preprocessing.image import ImageDataGenerator
 from keras.layers import Dropout, Flatten, Dense
