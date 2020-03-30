@@ -131,6 +131,3 @@ def test_train_split():
     print(Y_test_one_hot.shape)
 
     return (X_train, Y_train_one_hot, label_train), (X_test, Y_test_one_hot, label_test)
-
-
-test_train_split()

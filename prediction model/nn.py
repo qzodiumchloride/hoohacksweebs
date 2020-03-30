@@ -21,7 +21,7 @@ FILTER_SIZE = 3
 NUM_FILTERS = 32
 INPUT_SIZE = 32
 MAXPOOL_SIZE = 2
-BATCH_SIZE = 16
+BATCH_SIZE = 250
 EPOCHS = 10
 
 model = Sequential()
@@ -42,6 +42,7 @@ try:
 except:
     pass
 
+
 model.evaluate(X_test, Y_test)
 
-model.predict(X_test[0][0])
+probabilities = model.predict(np.array(X_test[0]))
